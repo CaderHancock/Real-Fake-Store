@@ -6,13 +6,14 @@ A Spring Boot REST API Portfolio Project
 
 Currently the controller package doesn't have much external functionality (Soon)
 
+
 Eventually, I would like to write a pure kotlin android client to boogie with the backend, but for now I'm focusing on the M and C, V can come later.
 
 Running at:
 
-35.247.12.204:8080
+35.247.12.204:8081
 
-Requires JDK 11
+Requires JDK 11 and Kafka
 
 To build and launch, run build.sh in the project root. 
 
