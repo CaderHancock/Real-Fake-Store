@@ -28,6 +28,7 @@ public class KafkaProducerConfig {
         configProps.put(
             ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
             IntegerSerializer.class);
+
         configProps.put(
             ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
             StringSerializer.class);
@@ -37,5 +38,25 @@ public class KafkaProducerConfig {
     @Bean
     public KafkaTemplate<Integer, String> kafkaTemplateIntStr() {
         return new KafkaTemplate<>(producerFactoryIntStr());
+    }
+    @Bean
+    public ProducerFactory<Integer, Integer> producerFactoryIntInt() {
+        Map<String, Object> configProps = new HashMap<>();
+        configProps.put(
+            ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
+            bootstrapAddress);
+        configProps.put(
+            ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+            IntegerSerializer.class);
+
+        configProps.put(
+            ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+            IntegerSerializer.class);
+        return new DefaultKafkaProducerFactory<>(configProps);
+    }
+
+    @Bean
+    public KafkaTemplate<Integer, Integer> kafkaTemplateIntInt(){
+        return new KafkaTemplate<>(producerFactoryIntInt());
     }
 }

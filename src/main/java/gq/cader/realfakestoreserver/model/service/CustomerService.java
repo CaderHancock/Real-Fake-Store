@@ -2,12 +2,12 @@ package gq.cader.realfakestoreserver.model.service;
 
 import gq.cader.realfakestoreserver.exception.CustomerNotFoundException;
 import gq.cader.realfakestoreserver.model.entity.Customer;
-import gq.cader.realfakestoreserver.model.entity.ShoppingCart;
 import gq.cader.realfakestoreserver.model.repository.CustomerRepository;
 import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,23 +21,16 @@ public class CustomerService {
             .getLogger(CustomerService.class);
 
     @Autowired
+    KafkaTemplate<Integer, String> integerStringKafkaTemplate;
+    @Autowired
+    KafkaTemplate<Integer, Integer> integerIntegerKafkaTemplate;
+    @Autowired
     public CustomerService(CustomerRepository customerRepository,
                            ShoppingCartService shoppingCartService) {
 
         this.customerRepository = customerRepository;
         this.shoppingCartService = shoppingCartService;
 
-    }
-
-    public Customer createCustomer(
-            String firstName, String lastName, String email) {
-
-        Customer customer = new Customer();
-        customer.setFirstName(firstName);
-        customer.setLastName(lastName);
-        customer.setEmail(email);
-        customer.setShoppingCart(new ShoppingCart());
-        return this.postNewCustomer(customer);
     }
 
     public Customer postNewCustomer(Customer customer) {
@@ -73,4 +66,12 @@ public class CustomerService {
 
     }
 
+    public void newSearchQueryMessage(Integer customerId, String query) {
+        integerStringKafkaTemplate.send("searches",customerId, query);
+    }
+
+    public void newProductViewedMessage(Integer customerId, Integer productId) {
+        integerIntegerKafkaTemplate.send("viewed_product",
+                                         customerId, productId);
+    }
 }

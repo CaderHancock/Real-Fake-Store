@@ -60,7 +60,7 @@ public class CustomerController {
     public Customer createCustomer(@PathVariable String firstName,
                                    @PathVariable String lastName,
                                    @PathVariable String email){
-        return customerService.save(new Customer(firstName, lastName, email));
+        return customerService.postNewCustomer(new Customer(firstName, lastName, email));
     }
 
     @GetMapping(value = "/{id}/addresses/add/{streetAddress}/{city" +
@@ -126,13 +126,39 @@ public class CustomerController {
             return e.getMessage();
         }
     }
-    @GetMapping(value = "/{id}/search/{query}")
-    public List<Product> search(@PathVariable Integer id,
+    @GetMapping(value = "/{customerId}/viewProduct/{productId}")
+    public Product viewProduct(@PathVariable Integer customerId,
+                                @PathVariable Integer productId){
+        try {
+            Product product = productService.findById(productId);
+            customerService.newProductViewedMessage(customerId, productId);
+            return product;
+        }catch (ProductNotFoundException e){
+            return null;
+        }
+    }
+    @GetMapping(value = "/{customerId}/search/{query}")
+    public List<Product> search(@PathVariable Integer customerId,
                                 @PathVariable String query){
         try {
-            return productService.search(id,query);
+            customerService.newSearchQueryMessage(customerId, query);
+            return productService.search(query);
         }catch (ProductNotFoundException e){
             return Collections.emptyList();
+        }
+    }
+    @GetMapping(value = "/{customerId}/search/{query}/{resultNum}")
+    public Product searchResult(@PathVariable Integer customerId,
+                                      @PathVariable String query,
+                                      @PathVariable Integer resultNum){
+        try {
+            Product product = productService.search(query)
+                .get(resultNum);
+            customerService.newProductViewedMessage(customerId,
+                product.getProductId());
+            return product;
+        }catch (Exception e){
+            return null;
         }
     }
 }

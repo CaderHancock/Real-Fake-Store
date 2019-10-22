@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,8 +17,6 @@ public class ProductService {
     private static final Logger LOG = LoggerFactory
             .getLogger(ProductService.class);
     private final ProductRepository productRepository;
-    @Autowired
-    private KafkaTemplate<Integer, String> kafkaTemplate;
 
     @Autowired
     public ProductService(ProductRepository productRepository) {
@@ -70,8 +67,8 @@ public class ProductService {
                 .orElseThrow(ProductNotFoundException::new);
 
     }
-    public List<Product> search(Integer customerId, String query){
-        kafkaTemplate.send("searches",customerId, query);
+    public List<Product> search(String query){
+
         return findByNameContains(query);
     }
 }
