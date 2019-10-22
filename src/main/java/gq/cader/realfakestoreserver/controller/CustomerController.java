@@ -1,5 +1,6 @@
 package gq.cader.realfakestoreserver.controller;
 
+import gq.cader.realfakestoreserver.exception.ProductNotFoundException;
 import gq.cader.realfakestoreserver.model.entity.Address;
 import gq.cader.realfakestoreserver.model.entity.Customer;
 import gq.cader.realfakestoreserver.model.entity.Product;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -122,6 +124,15 @@ public class CustomerController {
         }catch(Exception e){
             LOG.error(e.getMessage());
             return e.getMessage();
+        }
+    }
+    @GetMapping(value = "/{id}/search/{query}")
+    public List<Product> search(@PathVariable Integer id,
+                                @PathVariable String query){
+        try {
+            return productService.search(id,query);
+        }catch (ProductNotFoundException e){
+            return Collections.emptyList();
         }
     }
 }
