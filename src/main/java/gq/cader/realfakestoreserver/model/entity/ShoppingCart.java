@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -21,7 +22,7 @@ public class ShoppingCart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @ElementCollection(targetClass = Integer.class)
+    @ElementCollection(targetClass = Integer.class, fetch = FetchType.EAGER)
     @MapKeyColumn(name = "PRODUCT")
     @EqualsAndHashCode.Exclude
     private Map<Product, Integer> productQuantityMap;

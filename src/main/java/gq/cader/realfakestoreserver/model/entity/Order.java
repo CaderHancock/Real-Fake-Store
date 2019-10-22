@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -24,9 +25,9 @@ public class Order {
     @EqualsAndHashCode.Exclude
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
-    @OneToOne(cascade= {CascadeType.ALL})
+    @OneToOne(cascade= {CascadeType.ALL}, fetch = FetchType.EAGER)
     private  ShoppingCart shoppingCart;
-    @ManyToOne(targetEntity = Address.class)
+    @ManyToOne(targetEntity = Address.class, fetch = FetchType.EAGER)
     private  Address address;
     @Column(name = "TIMESTAMP")
     private  Instant timeOrderReceived;

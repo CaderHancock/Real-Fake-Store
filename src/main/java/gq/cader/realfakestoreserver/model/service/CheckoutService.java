@@ -65,7 +65,7 @@ public class CheckoutService {
                 "Options:\r\n" + avaliableAddresses);
 
         }
-        return checkout(customer, customer.getAddresses().get(0));
+        return checkout(customer, customer.getAddresses().iterator().next());
     }
 
     /**
