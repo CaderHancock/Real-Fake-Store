@@ -74,7 +74,7 @@ public class CheckoutService {
                 "Options:\r\n" + availableAddresses);
 
         }
-        checkout(customer, customer.getAddresses().iterator().next());
+        checkout(customer, customer.getAddresses().stream().findFirst().get());
     }
 
     /**

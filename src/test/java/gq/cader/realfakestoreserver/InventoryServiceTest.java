@@ -20,7 +20,6 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-
 @RunWith(SpringJUnit4ClassRunner.class)
 public class InventoryServiceTest {
 
@@ -62,10 +61,6 @@ public class InventoryServiceTest {
             throws CheckoutFailedException {
             super.reduceProductInventoryByDelta(productQuantityMap);}
     }
-
-
-
-
 
     @Before
     public void setUp(){
