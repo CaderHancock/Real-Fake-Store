@@ -2,6 +2,7 @@ package gq.cader.realfakestoreserver.model.entity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -34,11 +35,13 @@ public class Customer {
 
     @OneToOne(cascade= {CascadeType.ALL}, fetch = FetchType.EAGER)
     @EqualsAndHashCode.Exclude
+    @NonNull
     private ShoppingCart shoppingCart;
 
     @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     @Column(name = "ADDRESSES")
     @EqualsAndHashCode.Exclude
+    @NonNull
     private Set<Address> addresses;
 
     //TODO Figure out what annotation needed to
@@ -50,6 +53,7 @@ public class Customer {
     @OneToMany(targetEntity = Order.class, cascade= {CascadeType.ALL},
         fetch = FetchType.EAGER)
     @EqualsAndHashCode.Exclude
+    @NonNull
     private Set<Order> orders;
 
     public Customer(){

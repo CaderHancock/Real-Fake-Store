@@ -60,7 +60,8 @@ public class CustomerController {
     public Customer createCustomer(@PathVariable String firstName,
                                    @PathVariable String lastName,
                                    @PathVariable String email){
-        return customerService.postNewCustomer(new Customer(firstName, lastName, email));
+        return customerService.postNewCustomer(new Customer(
+            firstName, lastName, email));
     }
 
     @GetMapping(value = "/{id}/addresses/add/{streetAddress}/{city" +

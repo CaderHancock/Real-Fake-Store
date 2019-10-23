@@ -41,7 +41,7 @@ public class CheckoutService {
     public CheckoutService(InventoryService inventoryService,
                            CustomerService customerService,
                            @Qualifier("kafkaTemplateIntStr")
-                           KafkaTemplate orderMessageProducer){
+                           KafkaTemplate<Integer, String> orderMessageProducer){
 
         this.inventoryService = inventoryService;
         this.customerService =  customerService;
@@ -57,21 +57,18 @@ public class CheckoutService {
         AddressException,
         CheckoutFailedException {
 
-        if (customer.getAddresses() == null ||
-            customer.getAddresses().isEmpty()){
+        if (customer.getAddresses().isEmpty()){
 
             throw new AddressException("Address Missing");
 
         }else if(customer.getAddresses().size() > 1){
             StringBuilder availableAddresses = new StringBuilder();
-            customer.getAddresses().forEach(address -> {
-                availableAddresses
-                    .append("Id:")
-                    .append(address.getAddressId())
-                    .append(" ")
-                    .append(address.getStreetAddress())
-                    .append("\r\n");
-            });
+            customer.getAddresses().forEach(address -> availableAddresses
+                .append("Id:")
+                .append(address.getAddressId())
+                .append(" ")
+                .append(address.getStreetAddress())
+                .append("\r\n"));
             throw new AddressException("Address Not Selected. Available " +
                 "Options:\r\n" + availableAddresses);
 
@@ -114,7 +111,7 @@ public class CheckoutService {
             "checked out");
         String orderJson = "";
         try {
-           orderJson =
+            orderJson =
                new ObjectMapper().writeValueAsString(order);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
