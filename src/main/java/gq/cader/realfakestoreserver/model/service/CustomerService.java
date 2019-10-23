@@ -25,16 +25,18 @@ public class CustomerService {
     @Autowired
     public CustomerService(CustomerRepository customerRepository,
                            @Qualifier("kafkaTemplateIntStr")
-                           KafkaTemplate queryMessageProducer,
+                           KafkaTemplate<Integer, String>
+                               queryMessageProducer,
                            @Qualifier("kafkaTemplateIntInt")
-                           KafkaTemplate productViewedMessageProducer) {
+                           KafkaTemplate<Integer, Integer>
+                               productViewedMessageProducer){
 
         this.customerRepository = customerRepository;
         this.productViewedMessageProducer = productViewedMessageProducer;
         this.queryMessageProducer = queryMessageProducer;
     }
 
-    public Customer postNewCustomer(Customer customer) {
+    public Customer postNewCustomer(@NonNull Customer customer) {
         if (customerRepository.findByEmail(customer.getEmail()).isPresent()) {
             LOG.info("Customer: " + customer.toString() + " Already exists");
             return customerRepository.findByEmail(customer.getEmail()).get();
@@ -47,7 +49,7 @@ public class CustomerService {
         return customerRepository.findAll();
     }
 
-    public Customer findById(Integer customerId)
+    public Customer findById(@NonNull Integer customerId)
             throws CustomerNotFoundException {
 
         LOG.info("Querying CustomerRepository for ID:" + customerId.toString());
@@ -62,9 +64,9 @@ public class CustomerService {
     public List<Customer> findByLastName(String name) {
         return customerRepository.findByLastNameContainsIgnoreCase(name);
     }
+
     public Customer save(Customer customer){
         return customerRepository.save(customer);
-
     }
 
     public void newSearchQueryMessage(Integer customerId, String query) {

@@ -9,6 +9,7 @@ import gq.cader.realfakestoreserver.model.entity.Customer;
 import gq.cader.realfakestoreserver.model.entity.Order;
 import gq.cader.realfakestoreserver.model.entity.Product;
 import gq.cader.realfakestoreserver.model.entity.ShoppingCart;
+import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +54,7 @@ public class CheckoutService {
      * @throws AddressException
      * @throws CheckoutFailedException
      */
-    public void checkout(Customer customer) throws
+    public void checkout(@NonNull Customer customer) throws
         AddressException,
         CheckoutFailedException {
 
@@ -83,7 +84,7 @@ public class CheckoutService {
      * @param address  the address
      * @throws CheckoutFailedException the checkout failed exception
      */
-    public void checkout (Customer customer, Address address)
+    public void checkout (@NonNull Customer customer, Address address)
         throws CheckoutFailedException {
 
         if (!customer.getAddresses().contains(address)){

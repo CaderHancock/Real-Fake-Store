@@ -4,6 +4,7 @@ import gq.cader.realfakestoreserver.exception.CheckoutFailedException;
 import gq.cader.realfakestoreserver.exception.ProductInventoryException;
 import gq.cader.realfakestoreserver.model.entity.Product;
 
+import lombok.NonNull;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ public class InventoryService {
         this.productService = productService;
     }
     protected void reduceProductInventoryByDelta(
-        Map<Product,Integer> productQuantityMap)
+        @NonNull Map<Product,Integer> productQuantityMap)
         throws CheckoutFailedException{
 
         Map<Product,Integer> stagedChanges = new HashMap<>();
@@ -51,8 +52,8 @@ public class InventoryService {
         LOG.info(product.getName() +
                 " inventory successfully reduced by:" + delta);
     }
-    protected void increaseProductInventoryByDelta(
-        Product product, Integer delta) {
+    private void increaseProductInventoryByDelta(
+        @NonNull Product product, Integer delta) {
 
         product.setNumInInventory(product.getNumInInventory() + delta);
         productService.putUpdatedProduct(product);
@@ -60,7 +61,7 @@ public class InventoryService {
             " inventory successfully increased by:" + delta);
     }
     protected Boolean verifyProductInventory(
-            Product product, Integer quantity)
+        @NonNull Product product, Integer quantity)
             throws ProductInventoryException {
 
         product.setNumInInventory(productService.refresh(product)

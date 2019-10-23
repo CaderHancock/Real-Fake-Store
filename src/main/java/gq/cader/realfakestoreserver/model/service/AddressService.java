@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class AddressService {
 
-    private static final Logger LOG =
-        LoggerFactory.getLogger(AddressService.class);
+    /*private static final Logger LOG =
+        LoggerFactory.getLogger(AddressService.class);*/
     private  AddressRepository addressRepository;
 
     @Autowired

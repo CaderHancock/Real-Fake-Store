@@ -3,7 +3,7 @@ package gq.cader.realfakestoreserver.model.service;
 import gq.cader.realfakestoreserver.exception.ProductNotFoundException;
 import gq.cader.realfakestoreserver.model.entity.Product;
 import gq.cader.realfakestoreserver.model.repository.ProductRepository;
-import org.jetbrains.annotations.NotNull;
+import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,11 +39,11 @@ public class ProductService {
      * @param product to refresh
      * @return product with updated fields
      */
-    public Product refresh(@NotNull Product product){
+    public Product refresh(@NonNull Product product){
         return this.findById(product.getProductId());
     }
 
-    public Product postNewProduct(@NotNull Product product) {
+    public Product postNewProduct(@NonNull Product product) {
         if (productRepository.findByName(product.getName()).isPresent()){
 
             Product alreadyExistingProduct = productRepository.findByName(

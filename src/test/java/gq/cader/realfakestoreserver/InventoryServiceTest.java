@@ -37,9 +37,9 @@ public class InventoryServiceTest {
 
     //We need to stub and call protected/private methods for this test, hence
     // the local classes
-    private class MockProductService extends ProductService{
-        public Set<Product> mockRepo = new HashSet<>();
-        public MockProductService(ProductRepository productRepository) {
+    private static class MockProductService extends ProductService{
+        Set<Product> mockRepo = new HashSet<>();
+        MockProductService(ProductRepository productRepository) {
             super(productRepository);
         }
         @Override
@@ -52,8 +52,8 @@ public class InventoryServiceTest {
             }
         }
     }
-    private class TestableInventoryService extends InventoryService{
-        public TestableInventoryService(ProductService productService) {
+    private static class TestableInventoryService extends InventoryService{
+        TestableInventoryService(ProductService productService) {
             super(productService);
         }
         @Override
@@ -68,7 +68,7 @@ public class InventoryServiceTest {
 
 
     @Before
-    public void setup(){
+    public void setUp(){
 
         Mockito.doReturn(product1).when(productService).refresh(product1);
         Mockito.doReturn(product2).when(productService).refresh(product2);
