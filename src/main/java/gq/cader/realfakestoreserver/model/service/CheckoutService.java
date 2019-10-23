@@ -1,5 +1,7 @@
 package gq.cader.realfakestoreserver.model.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import gq.cader.realfakestoreserver.exception.AddressException;
 import gq.cader.realfakestoreserver.exception.CheckoutFailedException;
 import gq.cader.realfakestoreserver.model.entity.Address;
@@ -10,6 +12,8 @@ import gq.cader.realfakestoreserver.model.entity.ShoppingCart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -25,7 +29,7 @@ public class CheckoutService {
         .getLogger(CheckoutService.class);
     private final InventoryService inventoryService;
     private final CustomerService customerService;
-
+    private KafkaTemplate<Integer, String> orderMessageProducer;
 
     /**
      * Instantiates a new Checkout service.
@@ -35,19 +39,21 @@ public class CheckoutService {
      */
     @Autowired
     public CheckoutService(InventoryService inventoryService,
-                           CustomerService customerService){
+                           CustomerService customerService,
+                           @Qualifier("kafkaTemplateIntStr")
+                           KafkaTemplate orderMessageProducer){
+
         this.inventoryService = inventoryService;
         this.customerService =  customerService;
+        this.orderMessageProducer = orderMessageProducer;
     }
-
 
     /**
      * @param customer the customer
      * @throws AddressException
      * @throws CheckoutFailedException
-     * @return
      */
-    public Order checkout(Customer customer) throws
+    public void checkout(Customer customer) throws
         AddressException,
         CheckoutFailedException {
 
@@ -57,15 +63,20 @@ public class CheckoutService {
             throw new AddressException("Address Missing");
 
         }else if(customer.getAddresses().size() > 1){
-            StringBuilder avaliableAddresses = new StringBuilder();
-            customer.getAddresses().forEach(address ->
-                avaliableAddresses.append("Id:" + address.getAddressId() + " "
-                    + address.getStreetAddress() + "\r\n"));
-            throw new AddressException("Address Not Selected. Avaliable " +
-                "Options:\r\n" + avaliableAddresses);
+            StringBuilder availableAddresses = new StringBuilder();
+            customer.getAddresses().forEach(address -> {
+                availableAddresses
+                    .append("Id:")
+                    .append(address.getAddressId())
+                    .append(" ")
+                    .append(address.getStreetAddress())
+                    .append("\r\n");
+            });
+            throw new AddressException("Address Not Selected. Available " +
+                "Options:\r\n" + availableAddresses);
 
         }
-        return checkout(customer, customer.getAddresses().iterator().next());
+        checkout(customer, customer.getAddresses().iterator().next());
     }
 
     /**
@@ -74,9 +85,8 @@ public class CheckoutService {
      * @param customer the customer
      * @param address  the address
      * @throws CheckoutFailedException the checkout failed exception
-     * @return
      */
-    public Order checkout (Customer customer, Address address)
+    public void checkout (Customer customer, Address address)
         throws CheckoutFailedException {
 
         if (!customer.getAddresses().contains(address)){
@@ -102,7 +112,15 @@ public class CheckoutService {
         customerService.save(customer);
         LOG.info("Customer:" + customer.getCustomerId() + " successfully " +
             "checked out");
-        return order;
+        String orderJson = "";
+        try {
+           orderJson =
+               new ObjectMapper().writeValueAsString(order);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        orderMessageProducer.send("orders",
+            customer.getCustomerId(), orderJson);
 
 
     }

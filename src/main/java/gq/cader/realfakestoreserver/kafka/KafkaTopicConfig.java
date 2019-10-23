@@ -35,4 +35,9 @@ public class KafkaTopicConfig {
         return new NewTopic("viewed_product", 3 ,
             (short) 1);
     }
+    @Bean
+    public NewTopic orders(){
+        return new NewTopic("orders", 3 ,
+            (short) 1);
+    }
 }

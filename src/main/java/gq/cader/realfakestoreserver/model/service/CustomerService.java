@@ -7,6 +7,7 @@ import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -16,21 +17,21 @@ import java.util.List;
 public class CustomerService {
 
     private final CustomerRepository customerRepository;
-    private final ShoppingCartService shoppingCartService;
     private static final Logger LOG = LoggerFactory
             .getLogger(CustomerService.class);
+    private KafkaTemplate<Integer, String> queryMessageProducer;
+    private KafkaTemplate<Integer, Integer> productViewedMessageProducer;
 
-    @Autowired
-    KafkaTemplate<Integer, String> integerStringKafkaTemplate;
-    @Autowired
-    KafkaTemplate<Integer, Integer> integerIntegerKafkaTemplate;
     @Autowired
     public CustomerService(CustomerRepository customerRepository,
-                           ShoppingCartService shoppingCartService) {
+                           @Qualifier("kafkaTemplateIntStr")
+                           KafkaTemplate queryMessageProducer,
+                           @Qualifier("kafkaTemplateIntInt")
+                           KafkaTemplate productViewedMessageProducer) {
 
         this.customerRepository = customerRepository;
-        this.shoppingCartService = shoppingCartService;
-
+        this.productViewedMessageProducer = productViewedMessageProducer;
+        this.queryMessageProducer = queryMessageProducer;
     }
 
     public Customer postNewCustomer(Customer customer) {
@@ -67,11 +68,11 @@ public class CustomerService {
     }
 
     public void newSearchQueryMessage(Integer customerId, String query) {
-        integerStringKafkaTemplate.send("searches",customerId, query);
+        queryMessageProducer.send("searches",customerId, query);
     }
 
     public void newProductViewedMessage(Integer customerId, Integer productId) {
-        integerIntegerKafkaTemplate.send("viewed_product",
+        productViewedMessageProducer.send("viewed_product",
                                          customerId, productId);
     }
 }
