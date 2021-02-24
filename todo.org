@@ -1,0 +1,2 @@
+* Inbox
+** TODO Clean up implementation of kafka templates
