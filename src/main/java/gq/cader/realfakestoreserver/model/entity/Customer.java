@@ -1,8 +1,7 @@
 package gq.cader.realfakestoreserver.model.entity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -15,9 +14,10 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.validation.constraints.Email;
-import java.util.HashSet;
-import java.util.Set;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 
 @Data
 @Entity
@@ -33,38 +33,37 @@ public class Customer {
     @Column(name = "LAST_NAME")
     private String lastName;
 
-    @OneToOne(cascade= {CascadeType.ALL}, fetch = FetchType.EAGER)
+    @OneToOne(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
     @EqualsAndHashCode.Exclude
     @NonNull
     private ShoppingCart shoppingCart;
 
-    @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
     @Column(name = "ADDRESSES")
     @EqualsAndHashCode.Exclude
     @NonNull
     private Set<Address> addresses;
 
-    //TODO Figure out what annotation needed to
+    // TODO Figure out what annotation needed to
     // force unique or one to one relationship
-    @Email
     private String email;
 
     @ElementCollection(targetClass = Order.class)
-    @OneToMany(targetEntity = Order.class, cascade= {CascadeType.ALL},
-        fetch = FetchType.EAGER)
+    @OneToMany(targetEntity = Order.class, cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
     @EqualsAndHashCode.Exclude
     @NonNull
     private Set<Order> orders;
 
-    public Customer(){
+    public Customer() {
         shoppingCart = new ShoppingCart();
         addresses = new HashSet<>();
         orders = new HashSet<>();
     }
-    public Customer(String firstName, String lastName, String email){
+
+    public Customer(String firstName, String lastName, String email) {
         this();
         this.firstName = firstName;
         this.lastName = lastName;
-        this.email =    email;
+        this.email = email;
     }
 }
