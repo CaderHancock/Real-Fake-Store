@@ -1,35 +1,33 @@
 package gq.cader.realfakestoreserver.model.service;
 
-import gq.cader.realfakestoreserver.exception.CustomerNotFoundException;
-import gq.cader.realfakestoreserver.model.entity.Customer;
-import gq.cader.realfakestoreserver.model.repository.CustomerRepository;
-import lombok.NonNull;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
+import org.springframework.util.concurrent.ListenableFutureCallback;
 
-import java.util.List;
+import gq.cader.realfakestoreserver.exception.CustomerNotFoundException;
+import gq.cader.realfakestoreserver.model.entity.Customer;
+import gq.cader.realfakestoreserver.model.repository.CustomerRepository;
+import lombok.NonNull;
 
 @Service
 public class CustomerService {
 
     private final CustomerRepository customerRepository;
-    private static final Logger LOG = LoggerFactory
-            .getLogger(CustomerService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CustomerService.class);
     private KafkaTemplate<Integer, String> queryMessageProducer;
     private KafkaTemplate<Integer, Integer> productViewedMessageProducer;
 
     @Autowired
     public CustomerService(CustomerRepository customerRepository,
-                           @Qualifier("kafkaTemplateIntStr")
-                           KafkaTemplate<Integer, String>
-                               queryMessageProducer,
-                           @Qualifier("kafkaTemplateIntInt")
-                           KafkaTemplate<Integer, Integer>
-                               productViewedMessageProducer){
+            @Qualifier("kafkaTemplateIntStr") KafkaTemplate<Integer, String> queryMessageProducer,
+            @Qualifier("kafkaTemplateIntInt") KafkaTemplate<Integer, Integer> productViewedMessageProducer) {
 
         this.customerRepository = customerRepository;
         this.productViewedMessageProducer = productViewedMessageProducer;
@@ -45,16 +43,15 @@ public class CustomerService {
             return customerRepository.save(customer);
         }
     }
+
     public @NonNull List<Customer> findAll() {
         return customerRepository.findAll();
     }
 
-    public Customer findById(@NonNull Integer customerId)
-            throws CustomerNotFoundException {
+    public Customer findById(@NonNull Integer customerId) throws CustomerNotFoundException {
 
         LOG.info("Querying CustomerRepository for ID:" + customerId.toString());
-        return customerRepository.findById(customerId)
-                .orElseThrow(CustomerNotFoundException::new);
+        return customerRepository.findById(customerId).orElseThrow(CustomerNotFoundException::new);
     }
 
     public List<Customer> findByFirstName(String name) {
@@ -65,16 +62,32 @@ public class CustomerService {
         return customerRepository.findByLastNameContainsIgnoreCase(name);
     }
 
-    public Customer save(Customer customer){
+    public Customer save(Customer customer) {
         return customerRepository.save(customer);
     }
 
-    public void newSearchQueryMessage(Integer customerId, String query) {
-        queryMessageProducer.send("searches",customerId, query);
+    public void sendSearchQueryMessage(Integer customerId, String query) {
+
+        var future = queryMessageProducer.send("searches", customerId, query);
+        future.addCallback(new ListenableFutureCallback<SendResult<Integer, String>>() {
+
+            @Override
+            public void onSuccess(SendResult<Integer, String> result) {
+                LOG.info("We need to go back to the furute!");
+
+            }
+
+            @Override
+            public void onFailure(Throwable ex) {
+                // TODO Auto-generated method stub
+
+            }
+
+        });
+
     }
 
-    public void newProductViewedMessage(Integer customerId, Integer productId) {
-        productViewedMessageProducer.send("viewed_product",
-                                         customerId, productId);
+    public void sendProductViewedMessage(Integer customerId, Integer productId) {
+        productViewedMessageProducer.send("viewed_product", customerId, productId);
     }
 }
